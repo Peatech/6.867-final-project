@@ -15,6 +15,10 @@ import torch.optim as optim
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader, random_split
 
+
+"""
+These imports bring in helper functions and classes from the utils folder
+"""
 from utils.models import FashionMNISTCNN
 from utils.basics import generic_train, test_total_accuracy, test_class_accuracy, save_model
 from utils.attacks import NoAttack, RandomAttack, TargetedAttack, UAPAttack
@@ -30,12 +34,14 @@ class Baseline:
             device (str, optional): where to run pytorch on. Defaults to "cpu".
         """        
         self.device = torch.device(device)
-        self.model = FashionMNISTCNN()
-        self.model.to(self.device)
+        self.model = FashionMNISTCNN() # Initialize the CNN model
+        self.model.to(self.device) # Move the model to the specified device (CPU/GPU)
 
 
     def load_data(self, batch_size=32):
         """
+        Loads the FashionMNIST dataset, normalizes the images, and creates 
+        DataLoader objects for both training and testing.
         load FashionMNIST data
         Args:
             batch_size (int, optional): the batch size. Defaults to 32.
@@ -62,7 +68,7 @@ class Baseline:
         class_acc = test_class_accuracy(self.model, self.testloader, self.device)
         return total_acc, class_acc
 
-
+        
     def _make_optimizer_and_loss(self, lr, momentum=0.9):
         """
         helper function to create an optimizer and loss function
@@ -82,6 +88,7 @@ class BasicBaseline(Baseline):
     def __init__(self, device="cpu"):
         """
         Basic CNN Baseline
+         Initializes a basic CNN model on a specified device
         Args:
             device (str, optional): the device to run pytorch on. Defaults to "cpu".
         """        
@@ -91,6 +98,7 @@ class BasicBaseline(Baseline):
     def set_trainloader(self, trainloader):
         """
         set the trainloader for the model
+        Allows external configuration of the training DataLoader
         Args:
             trainloader (torch.utils.data.Dataloader): the training data data loader
         """        
@@ -162,7 +170,7 @@ class FederatedBaseline(Baseline):
         assert num_malicious <= self.num_clients, "num_malicious must be <= num_clients"
         self.attack = attack
         self.num_malicious = num_malicious
-        self.attacks = [attack for i in range(num_malicious)]
+        self.attacks = [attack for i in range(num_malicious)]  # Applies attack to malicious clients
         self.attacks.extend([NoAttack() for i in range(self.num_clients - num_malicious)])
 
     
@@ -248,6 +256,7 @@ class FederatedBaseline(Baseline):
 
     def _make_client_trainloaders(self):
         """
+        Splits the training data among the clients.
         helper function to create client trainloader splits
         Returns:
             (list[torch.utils.data.Dataloader]): a list of dataloaders for the split data
@@ -258,6 +267,8 @@ class FederatedBaseline(Baseline):
 
     def _aggregate(self, client_models, malicious_upscale):
         """
+        Aggregates the client models into a global model. If there are malicious clients,
+        their updates are upscaled based on the malicious_upscale factor.
         global parameter updates aggregation.
         Args:
             client_models (list[torch.nn.Module]): the client models
@@ -314,7 +325,7 @@ if __name__ == "__main__":
         
         print(basic_baseline.test())
 
-        # save_model(basic_baseline.model, "basic_25epochs_NoAttack")
+        save_model(basic_baseline.model, "basic_25epochs_NoAttack")
 
     elif test == "federated":
         federated_baseline = FederatedBaseline(num_clients=num_clients, device=device)
@@ -331,11 +342,11 @@ if __name__ == "__main__":
         
         print(federated_baseline.test())
 
-        # save_model(federated_baseline.model, "defense_cm")
-        # logs = federated_baseline.round_log
-        # columns = ["overall"] + [f"class{i}" for i in range(10)]
-        # df = pd.DataFrame(np.array(logs), columns=columns)
-        # df.to_csv("random_attack_with_defense_10rounds.csv")
+          save_model(federated_baseline.model, "defense_cm")
+          logs = federated_baseline.round_log
+          columns = ["overall"] + [f"class{i}" for i in range(10)]
+          df = pd.DataFrame(np.array(logs), columns=columns)
+          df.to_csv("random_attack_with_defense_10rounds.csv")
     else:
         print("incorrect arguments.")
 
