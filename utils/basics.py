@@ -209,9 +209,13 @@ def initialize_weights(net):
 
 
 def save_model(model, name):
-    save_dir = os.path.join("saved_models", name)
-    torch.save(model.state_dict(), os.path.join("saved_models", f"{name}.pkl"))
+    # Ensure the 'saved_models' directory exists
+    if not os.path.exists("saved_models"):
+        os.makedirs("saved_models")  # Create the directory if it doesn't exist
 
+    # Save the model state dictionary
+    torch.save(model.state_dict(), os.path.join("saved_models", f"{name}.pkl"))
+    print(f"Model saved to saved_models/{name}.pkl")
 
 def load_model(model, name):
     model.load_state_dict(torch.load(os.path.join("saved_models", f"{name}.pkl")))
