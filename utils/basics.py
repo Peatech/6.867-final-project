@@ -223,7 +223,7 @@ def load_model(model, name):
 
 
 def uap_train(data_loader, generator, target_network, epsilon=1000, num_iterations=1000, targeted=False,
-            target_class=4, print_freq=200, use_cuda=False):
+            target_class=4, print_freq=200, use_cuda=True):
             
     #Define the parameters
     criterion = NegativeCrossEntropy()
