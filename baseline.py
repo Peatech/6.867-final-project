@@ -342,11 +342,11 @@ if __name__ == "__main__":
         
         print(federated_baseline.test())
 
-          save_model(federated_baseline.model, "defense_cm")
-          logs = federated_baseline.round_log
-          columns = ["overall"] + [f"class{i}" for i in range(10)]
-          df = pd.DataFrame(np.array(logs), columns=columns)
-          df.to_csv("random_attack_with_defense_10rounds.csv")
+        save_model(federated_baseline.model, "defense_cm")
+        logs = federated_baseline.round_log
+        columns = ["overall"] + [f"class{i}" for i in range(10)]
+        df = pd.DataFrame(np.array(logs), columns=columns)
+        df.to_csv("random_attack_with_defense_10rounds.csv")
     else:
         print("incorrect arguments.")
 
